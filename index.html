@@ -18,20 +18,28 @@
   </style>
 </head>
 <body>
+  <input type="file" id="file-input" accept=".csv">
   <div class="color-map" id="color-map"></div>
   <script>
-    // csvファイルの読み込み
-    const csvFile = 'data.csv'; // csvファイルのパス
-    fetch(csvFile)
-      .then(response => response.text())
-      .then(data => {
+    // ファイル入力ボックスの取得
+    const fileInput = document.getElementById('file-input');
+    
+    // ファイル入力ボックスの変更イベントハンドラー
+    fileInput.addEventListener('change', (e) => {
+      // 選択されたファイルの取得
+      const file = fileInput.files[0];
+      
+      // ファイルの読み込み
+      const reader = new FileReader();
+      reader.onload = (event) => {
         // csvデータのパース
-        const csvData = data.split('\n').map(row => row.split(','));
+        const csvData = event.target.result.split('\n').map(row => row.split(','));
         
         // カラーマップの作成
-        const colorMap = document.getElementById('color-map');
         const maxValue = Math.max(...csvData.flat().map(Number)); // 最大値の取得
         const minValue = Math.min(...csvData.flat().map(Number)); // 最小値の取得
+        const colorMap = document.getElementById('color-map');
+        colorMap.innerHTML = ''; // カラーマップのクリア
         csvData.forEach((row, rowIndex) => {
           row.forEach((value, colIndex) => {
             const numValue = Number(value);
@@ -42,8 +50,9 @@
             colorMap.appendChild(div);
           });
         });
-      })
-      .catch(error => console.error(error));
+      };
+      reader.readAsText(file);
+    });
   </script>
 </body>
 </html>
