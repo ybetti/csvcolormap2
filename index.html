@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>カラーマップ</title>
+  <style>
+    /* カラーマップのスタイル */
+    .color-map {
+      width: 500px;
+      height: 500px;
+      border: 1px solid black;
+    }
+    .color-map div {
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="color-map" id="color-map"></div>
+  <script>
+    // csvファイルの読み込み
+    const csvFile = 'data.csv'; // csvファイルのパス
+    fetch(csvFile)
+      .then(response => response.text())
+      .then(data => {
+        // csvデータのパース
+        const csvData = data.split('\n').map(row => row.split(','));
+        
+        // カラーマップの作成
+        const colorMap = document.getElementById('color-map');
+        const maxValue = Math.max(...csvData.flat().map(Number)); // 最大値の取得
+        const minValue = Math.min(...csvData.flat().map(Number)); // 最小値の取得
+        csvData.forEach((row, rowIndex) => {
+          row.forEach((value, colIndex) => {
+            const numValue = Number(value);
+            const ratio = (numValue - minValue) / (maxValue - minValue); // 値の比率
+            const color = `rgb(${Math.floor(255 * (1 - ratio))}, 0, ${Math.floor(255 * ratio)})`; // 色の計算
+            const div = document.createElement('div');
+            div.style.background = color;
+            colorMap.appendChild(div);
+          });
+        });
+      })
+      .catch(error => console.error(error));
+  </script>
+</body>
+</html>
